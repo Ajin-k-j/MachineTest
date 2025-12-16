@@ -1,0 +1,76 @@
+services:
+  # ---------------------------------------------------------
+  # Service: InfluxDB
+  # Automation: Uses ENV vars to auto-create Org/Bucket/Token
+  # ---------------------------------------------------------
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb_server
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=${DOCKER_INFLUXDB_INIT_MODE}
+      - DOCKER_INFLUXDB_INIT_USERNAME=${DOCKER_INFLUXDB_INIT_USERNAME}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${DOCKER_INFLUXDB_INIT_PASSWORD}
+      - DOCKER_INFLUXDB_INIT_ORG=${DOCKER_INFLUXDB_INIT_ORG}
+      - DOCKER_INFLUXDB_INIT_BUCKET=${DOCKER_INFLUXDB_INIT_BUCKET}
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    networks:
+      - monitoring_net
+    healthcheck:
+      test: "curl -f http://localhost:8086/ping"
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  # ---------------------------------------------------------
+  # Service: Grafana
+  # Automation: Mounts provisioning files to auto-register Data Source
+  # ---------------------------------------------------------
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana_server
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      # Mount provisioning configs (Note the ../ to go up to root)
+      - ../grafana/provisioning:/etc/grafana/provisioning
+      # Mount dashboards folder
+      - ../grafana/dashboards:/var/lib/grafana/dashboards
+    networks:
+      - monitoring_net
+    depends_on:
+      influxdb:
+        condition: service_healthy
+  
+  # ---------------------------------------------------------
+  # Service 3: System Monitor Script
+  # Task: Collects CPU/RAM and sends to InfluxDB
+  # ---------------------------------------------------------
+  system-monitor:
+    build: 
+      context: ../scripts/system-monitor
+    container_name: system_monitor_script
+    environment:
+      - INFLUX_URL=http://influxdb:8086
+      - INFLUX_ORG=${DOCKER_INFLUXDB_INIT_ORG}
+      - INFLUX_BUCKET=${DOCKER_INFLUXDB_INIT_BUCKET}
+      - INFLUX_TOKEN=${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
+    networks:
+      - monitoring_net
+    depends_on:
+      influxdb:
+        condition: service_healthy
+
+volumes:
+  influxdb_data:
+  grafana_data:
+
+networks:
+  monitoring_net:

@@ -1,0 +1,5 @@
+.env
+influxdb_data/
+grafana_data/
+__pycache__/
+*.pyc
