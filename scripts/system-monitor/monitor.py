@@ -23,9 +23,7 @@ def get_system_metrics():
     
     # Disk I/O (Read/Write bytes since boot)
     disk = psutil.disk_io_counters()
-    # We calculate the rate (bytes per second) by comparing with previous loop in a real app,
-    # but for simplicity, we will log the raw counter or current usage.
-    # Let's log disk usage % instead for the dashboard requirement.
+    # We will just report disk usage percentage
     disk_usage = psutil.disk_usage('/').percent
 
     return cpu_percent, mem_percent, disk_usage
