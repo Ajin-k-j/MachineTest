@@ -2,9 +2,6 @@
 
 This project implements a fully containerized monitoring stack using **InfluxDB** and **Grafana**, designed to monitor system resources and simulate an IoT sensor network. It is built to be strictly compliant with the machine test requirements.
 
-## 📂 Project Structure
-project-root/ ├── docker/ │ ├── docker-compose.yml # Orchestration for InfluxDB, Grafana, and Scripts │ └── .env # Configuration & Credentials ├── scripts/ │ ├── system-monitor/ # Service: Host System Metrics (CPU/RAM/Disk) │ └── iot-simulator/ # Service: Simulated IoT Sensor Data ├── grafana/ │ ├── provisioning/ # Automated Datasource & Dashboard setup │ └── dashboards/ # JSON Exports (System & IoT Dashboards) └── README.md
-
 ## ⚙️ Setup Instructions
 
 ### Prerequisites
@@ -14,8 +11,7 @@ project-root/ ├── docker/ │ ├── docker-compose.yml # Orchestration
 ### Installation & Execution
 1.  **Clone the Repository**
     ```bash
-    git clone <your-repo-url>
-    cd machine-test-2025
+    git clone https://github.com/Ajin-k-j/MachineTest.git
     ```
 
 2.  **Start the Services**
@@ -40,24 +36,23 @@ project-root/ ├── docker/ │ ├── docker-compose.yml # Orchestration
 
 ## 🔐 Default Credentials
 
-As requested in the requirements, the following default credentials are pre-configured in the `.env` file for testing purposes:
+The following default credentials are pre-configured in the `.env` file for testing purposes:
 
 | Service | URL | Username | Password |
 | :--- | :--- | :--- | :--- |
 | **Grafana** | [http://localhost:3000](http://localhost:3000) | `admin` | `admin` |
 | **InfluxDB** | [http://localhost:8086](http://localhost:8086) | `admin` | `adminpassword123` |
 
-*Note: If Grafana prompts to change the password on first login, you may skip it.*
 
 ## 📈 Expected Output / Results
 
 1.  **System Monitoring Dashboard:**
-    * Navigate to **Dashboards > System Monitoring**.
+    * Navigate to **Dashboards > Machine Test: System Monitoring**.
     * You should see live gauges for **CPU**, **Memory**, and **Disk Usage**.
     * Graphs will update every 5 seconds.
 
 2.  **IoT Sensor Monitoring Dashboard:**
-    * Navigate to **Dashboards > IoT Sensor Monitoring**.
+    * Navigate to **Dashboards > Machine Test: Sensor_Monitoring**.
     * You will see live data streams for **Temperature** (15-35°C), **Humidity** (30-80%), and **Pressure** (980-1020 hPa).
     * Data is simulated for three distinct devices (`sensor_01`, `sensor_02`, `sensor_03`).
 
